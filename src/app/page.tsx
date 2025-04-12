@@ -10,6 +10,7 @@ import {improveCode} from '@/ai/flows/improve-code';
 import {detectCodeErrors} from '@/ai/flows/detect-code-errors';
 import {Toaster} from '@/components/ui/toaster'; // Import Toaster component
 import JSZip from 'jszip';
+import {ScrollArea} from "@/components/ui/scroll-area";
 
 const initialHtml = '<!DOCTYPE html>\n<html lang="en">\n<head>\n    <meta charset="UTF-8">\n    <meta name="viewport" content="width=device-width, initial-scale=1.0">\n    <title>Web Weaver</title>\n</head>\n<body>\n    <h1>Hello, Web Weaver!</h1>\n    <p>Start building your website here.</p>\n</body>\n</html>';
 const initialCss = 'body {\n    font-family: sans-serif;\n    margin: 0;\n    padding: 20px;\n    background-color: #f0f0f0;\n}';
@@ -23,6 +24,7 @@ export default function Home() {
   const [isAiAssistantLoading, setIsAiAssistantLoading] = useState(false);
   const [isAiErrorDetectionLoading, setIsAiErrorDetectionLoading] = useState(false);
   const {toast} = useToast();
+  const [consoleOutput, setConsoleOutput] = useState('');
 
   useEffect(() => {
     updateLivePreview();
@@ -85,6 +87,7 @@ export default function Home() {
     setHtml('');
     setCss('');
     setJavascript('');
+    setConsoleOutput('');
   };
 
   const getAiSuggestions = async () => {
@@ -156,13 +159,35 @@ export default function Home() {
   };
 
   const runCode = () => {
+    // Clear previous console output
+    setConsoleOutput('');
     try {
-      // Safely execute JavaScript code within the iframe
+      // Redirect console.log to capture output
       const iframe = document.querySelector('iframe');
       if (iframe) {
         const iframeWindow = iframe.contentWindow as any;
         if (iframeWindow) {
-          iframeWindow.eval(javascript); // Execute the JavaScript code
+          let consoleMessages = [];
+          iframeWindow.console.log = (...args: any[]) => {
+            consoleMessages.push(args.map(arg => String(arg)).join(' '));
+            setConsoleOutput(prevOutput => prevOutput + args.map(arg => String(arg)).join(' ') + '\n');
+          };
+          iframeWindow.console.error = (...args: any[]) => {
+            consoleMessages.push("Error: " + args.map(arg => String(arg)).join(' '));
+            setConsoleOutput(prevOutput => prevOutput + "Error: " + args.map(arg => String(arg)).join(' ') + '\n');
+          };
+
+          // Execute the JavaScript code
+          iframeWindow.eval(javascript);
+
+          // Restore original console
+          iframeWindow.console.log = console.log;
+          iframeWindow.console.error = console.error;
+
+          // If no console messages were captured, display a default message
+          if (consoleMessages.length === 0) {
+            setConsoleOutput('Code executed without output.\n');
+          }
         } else {
           toast({
             variant: 'destructive',
@@ -178,6 +203,7 @@ export default function Home() {
         });
       }
     } catch (error: any) {
+      setConsoleOutput(`Error: ${error.message}\n`);
       toast({
         variant: 'destructive',
         title: 'Error',
@@ -185,6 +211,7 @@ export default function Home() {
       });
     }
   };
+
 
   return (
     <div className="flex h-screen w-full">
@@ -256,6 +283,16 @@ export default function Home() {
             Run Code
           </Button>
         </div>
+          <Card>
+            <CardHeader>
+              <CardTitle>Console</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <ScrollArea className="h-40 rounded-md">
+                <div className="whitespace-pre-line">{consoleOutput}</div>
+              </ScrollArea>
+            </CardContent>
+          </Card>
       </div>
 
       {/* Live Preview Section */}
