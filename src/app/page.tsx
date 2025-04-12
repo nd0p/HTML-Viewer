@@ -155,6 +155,37 @@ export default function Home() {
     }
   };
 
+  const runCode = () => {
+    try {
+      // Safely execute JavaScript code within the iframe
+      const iframe = document.querySelector('iframe');
+      if (iframe) {
+        const iframeWindow = iframe.contentWindow as any;
+        if (iframeWindow) {
+          iframeWindow.eval(javascript); // Execute the JavaScript code
+        } else {
+          toast({
+            variant: 'destructive',
+            title: 'Error',
+            description: 'Could not access iframe content.',
+          });
+        }
+      } else {
+        toast({
+          variant: 'destructive',
+          title: 'Error',
+          description: 'Iframe not found.',
+        });
+      }
+    } catch (error: any) {
+      toast({
+        variant: 'destructive',
+        title: 'Error',
+        description: error.message,
+      });
+    }
+  };
+
   return (
     <div className="flex h-screen w-full">
       {/* Code Input Section */}
@@ -220,6 +251,10 @@ export default function Home() {
             {!isAiErrorDetectionLoading && <Icons.shield className="mr-2 h-4 w-4" />}
             AI Error Detection
           </Button>
+          <Button onClick={runCode}>
+            <Icons.play className="mr-2 h-4 w-4" />
+            Run Code
+          </Button>
         </div>
       </div>
 
@@ -244,5 +279,4 @@ export default function Home() {
     </div>
   );
 }
-
 
