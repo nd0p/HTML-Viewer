@@ -118,7 +118,7 @@ export function Navbar({html, css, javascript, setHtml, setCss, setJavascript, s
 
   return (
     <div className="flex justify-between items-center p-4 bg-gray-200">
-      <h1 className="text-2xl font-bold">Web Weaver</h1>
+      <h1 className="text-2xl font-bold">HTML Viewer</h1>
       <div className="flex space-x-4">
         <Button onClick={downloadCode}>
           <Icons.download className="mr-2 h-4 w-4" />
