@@ -9,6 +9,7 @@ import {Icons} from '@/components/icons';
 import {improveCode} from '@/ai/flows/improve-code';
 import {detectCodeErrors} from '@/ai/flows/detect-code-errors';
 import {Toaster} from '@/components/ui/toaster'; // Import Toaster component
+import JSZip from 'jszip';
 
 const initialHtml = '<!DOCTYPE html>\n<html lang="en">\n<head>\n    <meta charset="UTF-8">\n    <meta name="viewport" content="width=device-width, initial-scale=1.0">\n    <title>Web Weaver</title>\n</head>\n<body>\n    <h1>Hello, Web Weaver!</h1>\n    <p>Start building your website here.</p>\n</body>\n</html>';
 const initialCss = 'body {\n    font-family: sans-serif;\n    margin: 0;\n    padding: 20px;\n    background-color: #f0f0f0;\n}';
