@@ -1,5 +1,3 @@
-# Firebase Studio
+# HTML Viewer With NextJS
 
-This is a NextJS starter in Firebase Studio.
-
-To get started, take a look at src/app/page.tsx.
+HTML Viewer with NextJS is a Open source you can use and edit an code if you understand NextJS
